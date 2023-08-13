@@ -96,6 +96,7 @@ async function reorganizeMoviesFolder() {
 	try {
 		const files = fs.readdirSync(moviesFolderPath);
 
+		console.log(`Reorganizing ${moviesFolderPath} with ${files.length} files...`);
 		for (const file of files) {
 			const moviePath = path.join(moviesFolderPath, file);
 			if (!fs.existsSync(moviePath)) continue;
