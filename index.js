@@ -242,6 +242,7 @@ async function moveTrickplayFilesNewFormat(movieName, newFolderPath) {
 		.filter((trickplayFile) => trickplayFile.includes(movieName));
 
 	for (const trickplayFile of trickplayFiles) {
+		const trickplayFilePath = path.join(trickplayMainFolderPath, trickplayFile);
 		const trickplayDestinationFilePath = path.join(newTrickplayFolderPath, trickplayFile);
 
 		// Create trickplay folder inside movie folder if it doesn't exist
