@@ -51,12 +51,14 @@ async function processSubfolder(subfolderPath) {
 	const trickplayFolderPath = path.join(subfolderPath, 'trickplay');
 
 	await moveFilesToDestination(trickplayFolderPath, path.join(moviesFolderPath, 'trickplay'));
+	console.log(`Moved trickplay files from ${trickplayFolderPath} to ${path.join(moviesFolderPath, 'trickplay')}`);
 
 	// Remove the now-empty trickplay subfolder.
 	fs.rmdirSync(trickplayFolderPath);
 	console.log(`Removed empty trickplay folder: ${trickplayFolderPath}`);
 
 	await moveFilesToDestination(subfolderPath, moviesFolderPath);
+	console.log(`Moved files from ${subfolderPath} to ${moviesFolderPath}`);
 
 	// Remove the processed subfolder.
 	fs.rmdirSync(subfolderPath);
@@ -75,6 +77,7 @@ async function moveFilesToDestination(source, destination) {
 		const destinationPath = path.join(destination, file);
 
 		fs.renameSync(sourcePath, destinationPath);
+		console.log(chalk.green(`Moved ${sourcePath} to ${destinationPath}`));
 		/* const shouldProceed = await promptUser(`Move ${sourcePath} to ${destinationPath}? (yes/no)\n`);
 		if (shouldProceed.toLowerCase() === 'y') {
 			fs.renameSync(sourcePath, destinationPath);
