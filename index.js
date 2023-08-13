@@ -104,7 +104,8 @@ async function reorganizeMoviesFolder() {
 			const movieExtension = file.substring(file.lastIndexOf('.') + 1);
 			if (!videoExtensions.includes(movieExtension)) continue;
 
-			await processMovieFile(file, moviePath, movieExtension);
+			// await processMovieFile(file, moviePath, movieExtension);
+			await processMovieFileNewFormat(file, moviePath, movieExtension);
 		}
 	} catch (err) {
 		console.error('Error reading movies folder:', err);
@@ -139,6 +140,124 @@ async function processMovieFile(file, moviePath, movieExtension) {
 
 	await moveAssociatedFiles(movieName, newFolderPath, title, year);
 	await moveTrickplayFiles(movieName, newFolderPath, title, year);
+}
+
+/**
+ * Moves new format movie files not in a folder to a folder.
+ * @param {string} file - The movie file name.
+ * @param {string} moviePath - Full path to the movie file.
+ * @param {string} movieExtension - The movie file's extension.
+ */
+async function processMovieFileNewFormat(file, moviePath, movieExtension) {
+	const movieName = file.substring(0, file.lastIndexOf('.'));
+
+	if (!movieName.includes(' (') || !movieName.includes(')')){
+		console.log(`Skipping ${moviePath} - Invalid format`);
+		return;
+	}
+
+	const newFolderPath = createNewFolderPathNewFormat(movieName);
+	const newMoviePath = getNewMoviePathNewFormat(newFolderPath, movieName, movieExtension);
+
+	const shouldRename = await promptUser(`Rename ${moviePath} to ${newMoviePath}? (yes/no)\n`);
+	if (shouldRename.toLowerCase() === 'y') {
+		fs.renameSync(moviePath, newMoviePath);
+		console.log(chalk.green(`Renamed ${moviePath} to ${newMoviePath}`));
+	} else {
+		console.log(chalk.red(`Skipped renaming ${moviePath}`));
+	}
+
+	await moveAssociatedFilesNewFormat(movieName, newFolderPath);
+	await moveTrickplayFilesNewFormat(movieName, newFolderPath);
+}
+
+/**
+ * Creates the new folder path for the movie and returns it.
+ * @param {string} movieName - Original name of the movie.
+ * @returns {string} - New folder path.
+ */
+function createNewFolderPathNewFormat(movieName) {
+	const newFolderPath = path.join(moviesFolderPath, movieName);
+	if (!fs.existsSync(newFolderPath)) {
+		fs.mkdirSync(newFolderPath);
+	}
+	return newFolderPath;
+}
+
+/**
+ * Returns the new path for the movie.
+ * @param {string} newFolderPath - Folder path to store the movie.
+ * @param {string} movieName - Original name of the movie.
+ * @param {string} movieExtension - Movie file extension.
+ * @returns {string} - New path for the movie.
+ */
+function getNewMoviePathNewFormat(newFolderPath, movieName, movieExtension) {
+	return path.join(newFolderPath, `${movieName}.${movieExtension}`);
+}
+
+/**
+ * Moves files associated with a movie (e.g. subtitles, images) to its new location.
+ * @param {string} movieName - Original name of the movie.
+ * @param {string} newFolderPath - New path for the movie.
+ */
+async function moveAssociatedFilesNewFormat(movieName, newFolderPath) {
+	const associatedFiles = fs.readdirSync(moviesFolderPath)
+		.filter((associatedFile) => associatedFile.includes(movieName));
+
+	for (const associatedFile of associatedFiles) {
+		const associatedFilePath = path.join(moviesFolderPath, associatedFile);
+		const newAssociatedFilePath = path.join(newFolderPath, associatedFile);
+
+		fs.renameSync(associatedFilePath, newAssociatedFilePath);
+		console.log(chalk.green(`Moved ${associatedFilePath} to ${newAssociatedFilePath}`));
+		/* const shouldMoveAssociatedFile = await promptUser(`Move ${associatedFilePath} to ${newAssociatedFilePath}? (yes/no)\n`);
+		if (shouldMoveAssociatedFile.toLowerCase() === 'y') {
+			fs.renameSync(associatedFilePath, newAssociatedFilePath);
+			console.log(chalk.green(`Moved ${associatedFilePath} to ${newAssociatedFilePath}`));
+		} else {
+			console.log(chalk.red(`Skipped moving ${associatedFilePath}`));
+		} */
+	}
+}
+
+/** 
+ * Handle the movement of files from the main 'trickplay' folder to their respective sub-trickplay folders inside each movie folder.
+ * @param {string} movieName - Original name of the movie.
+ * @param {string} newFolderPath - New path for the movie.
+ */
+async function moveTrickplayFilesNewFormat(movieName, newFolderPath) {
+	const trickplayMainFolderPath = path.join(moviesFolderPath, 'trickplay');
+	const newTrickplayFolderPath = path.join(newFolderPath, 'trickplay');
+
+	// Ensure the main trickplay folder exists
+	if (!fs.existsSync(trickplayMainFolderPath)) {
+		console.log(chalk.yellow('Main trickplay folder not found.'));
+		return;
+	}
+
+	// Get all trickplay files associated with the movie
+	const trickplayFiles = fs.readdirSync(trickplayMainFolderPath)
+		.filter((trickplayFile) => trickplayFile.includes(movieName));
+
+	for (const trickplayFile of trickplayFiles) {
+		const trickplayDestinationFilePath = path.join(newTrickplayFolderPath, trickplayFile);
+
+		// Create trickplay folder inside movie folder if it doesn't exist
+		if (!fs.existsSync(newTrickplayFolderPath)) {
+			fs.mkdirSync(newTrickplayFolderPath);
+		}
+
+		fs.renameSync(trickplayFilePath, trickplayDestinationFilePath);
+		console.log(chalk.green(`Moved ${trickplayFilePath} to ${trickplayDestinationFilePath}`));
+
+		/* const shouldMoveTrickplayFile = await promptUser(`Move ${trickplayFilePath} to ${trickplayDestinationFilePath}? (yes/no)\n`);
+		if (shouldMoveTrickplayFile.toLowerCase() === 'y') {
+			fs.renameSync(trickplayFilePath, trickplayDestinationFilePath);
+			console.log(chalk.green(`Moved ${trickplayFilePath} to ${trickplayDestinationFilePath}`));
+		} else {
+			console.log(chalk.red(`Skipped moving ${trickplayFilePath}`));
+		} */
+	}
 }
 
 /**
@@ -239,7 +358,7 @@ async function moveTrickplayFiles(movieName, newFolderPath, title, year) {
 }
 
 (async () => {
-  await moveSubfolderContentsToMainFolder();
+  // await moveSubfolderContentsToMainFolder();
   await reorganizeMoviesFolder();
   rl.close();
 })();
