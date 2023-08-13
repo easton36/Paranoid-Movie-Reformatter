@@ -105,8 +105,8 @@ async function reorganizeMoviesFolder() {
 			const movieExtension = file.substring(file.lastIndexOf('.') + 1);
 			if (!videoExtensions.includes(movieExtension)) continue;
 
-			// await processMovieFile(file, moviePath, movieExtension);
-			await processMovieFileNewFormat(file, moviePath, movieExtension);
+			await processMovieFile(file, moviePath, movieExtension);
+			// await processMovieFileNewFormat(file, moviePath, movieExtension);
 		}
 	} catch (err) {
 		console.error('Error reading movies folder:', err);
