@@ -9,6 +9,8 @@ const {
 function setupMockEnvironment() {
 	mock({
 		'Movies': {
+			'A Fake Movie (2020).mp4': 'movie content',
+
 			'10 Minutes Gone - 2019.mp4': 'movie content',
 			'10 Minutes Gone - 2019.nfo': 'info content',
 			'10 Minutes Gone - 2019-backdrop.jpg': 'image content',

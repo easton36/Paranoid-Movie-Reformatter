@@ -74,13 +74,14 @@ async function moveFilesToDestination(source, destination) {
 		const sourcePath = path.join(source, file);
 		const destinationPath = path.join(destination, file);
 
-		const shouldProceed = await promptUser(`Move ${sourcePath} to ${destinationPath}? (yes/no)\n`);
+		fs.renameSync(sourcePath, destinationPath);
+		/* const shouldProceed = await promptUser(`Move ${sourcePath} to ${destinationPath}? (yes/no)\n`);
 		if (shouldProceed.toLowerCase() === 'y') {
 			fs.renameSync(sourcePath, destinationPath);
 			console.log(chalk.green(`Moved ${sourcePath} to ${destinationPath}`));
 		} else {
 			console.log(chalk.red(`Skipped moving ${sourcePath}`));
-		}
+		} */
 	}
 }
 
@@ -180,13 +181,14 @@ async function moveAssociatedFiles(movieName, newFolderPath, title, year) {
 		const associatedFilePath = path.join(moviesFolderPath, associatedFile);
 		const newAssociatedFilePath = path.join(newFolderPath, newAssociatedFileName);
 
-		const shouldMoveAssociatedFile = await promptUser(`Move ${associatedFilePath} to ${newAssociatedFilePath}? (yes/no)\n`);
+		fs.renameSync(associatedFilePath, newAssociatedFilePath);
+		/* const shouldMoveAssociatedFile = await promptUser(`Move ${associatedFilePath} to ${newAssociatedFilePath}? (yes/no)\n`);
 		if (shouldMoveAssociatedFile.toLowerCase() === 'y') {
 			fs.renameSync(associatedFilePath, newAssociatedFilePath);
 			console.log(chalk.green(`Moved ${associatedFilePath} to ${newAssociatedFilePath}`));
 		} else {
 			console.log(chalk.red(`Skipped moving ${associatedFilePath}`));
-		}
+		} */
 	}
 }
 
@@ -221,14 +223,15 @@ async function moveTrickplayFiles(movieName, newFolderPath, title, year) {
 			fs.mkdirSync(newTrickplayFolderPath);
 		}
 
-		const shouldMoveTrickplayFile = await promptUser(`Move ${trickplayFilePath} to ${trickplayDestinationFilePath}? (yes/no)\n`);
+		fs.renameSync(trickplayFilePath, trickplayDestinationFilePath);
 
+		/* const shouldMoveTrickplayFile = await promptUser(`Move ${trickplayFilePath} to ${trickplayDestinationFilePath}? (yes/no)\n`);
 		if (shouldMoveTrickplayFile.toLowerCase() === 'y') {
 			fs.renameSync(trickplayFilePath, trickplayDestinationFilePath);
 			console.log(chalk.green(`Moved ${trickplayFilePath} to ${trickplayDestinationFilePath}`));
 		} else {
 			console.log(chalk.red(`Skipped moving ${trickplayFilePath}`));
-		}
+		} */
 	}
 }
 
