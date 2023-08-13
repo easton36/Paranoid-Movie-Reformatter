@@ -205,6 +205,8 @@ async function moveAssociatedFilesNewFormat(movieName, newFolderPath) {
 		.filter((associatedFile) => associatedFile.includes(movieName));
 
 	for (const associatedFile of associatedFiles) {
+		// skip directories
+		if (fs.statSync(path.join(moviesFolderPath, associatedFile)).isDirectory()) continue;
 		const associatedFilePath = path.join(moviesFolderPath, associatedFile);
 		const newAssociatedFilePath = path.join(newFolderPath, associatedFile);
 
