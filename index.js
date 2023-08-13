@@ -151,24 +151,23 @@ async function processMovieFile(file, moviePath, movieExtension) {
 async function processMovieFileNewFormat(file, moviePath, movieExtension) {
 	const movieName = file.substring(0, file.lastIndexOf('.'));
 
-	if (!movieName.includes(' (') || !movieName.includes(')')){
-		console.log(`Skipping ${moviePath} - Invalid format`);
-		return;
+	if (movieName.includes(' (') && movieName.includes(')')){
+		const newFolderPath = createNewFolderPathNewFormat(movieName);
+		const newMoviePath = getNewMoviePathNewFormat(newFolderPath, movieName, movieExtension);
+
+		const shouldRename = await promptUser(`Rename ${moviePath} to ${newMoviePath}? (yes/no)\n`);
+		if (shouldRename.toLowerCase() === 'y') {
+			fs.renameSync(moviePath, newMoviePath);
+			console.log(chalk.green(`Renamed ${moviePath} to ${newMoviePath}`));
+		} else {
+			console.log(chalk.red(`Skipped renaming ${moviePath}`));
+		}
+
+		await moveAssociatedFilesNewFormat(movieName, newFolderPath);
+		await moveTrickplayFilesNewFormat(movieName, newFolderPath);
 	}
 
-	const newFolderPath = createNewFolderPathNewFormat(movieName);
-	const newMoviePath = getNewMoviePathNewFormat(newFolderPath, movieName, movieExtension);
-
-	const shouldRename = await promptUser(`Rename ${moviePath} to ${newMoviePath}? (yes/no)\n`);
-	if (shouldRename.toLowerCase() === 'y') {
-		fs.renameSync(moviePath, newMoviePath);
-		console.log(chalk.green(`Renamed ${moviePath} to ${newMoviePath}`));
-	} else {
-		console.log(chalk.red(`Skipped renaming ${moviePath}`));
-	}
-
-	await moveAssociatedFilesNewFormat(movieName, newFolderPath);
-	await moveTrickplayFilesNewFormat(movieName, newFolderPath);
+	console.log(`Skipping ${moviePath} - Invalid format`);
 }
 
 /**
@@ -307,6 +306,7 @@ async function moveAssociatedFiles(movieName, newFolderPath, title, year) {
 		const newAssociatedFilePath = path.join(newFolderPath, newAssociatedFileName);
 
 		fs.renameSync(associatedFilePath, newAssociatedFilePath);
+		console.log(chalk.green(`Moved ${associatedFilePath} to ${newAssociatedFilePath}`));
 		/* const shouldMoveAssociatedFile = await promptUser(`Move ${associatedFilePath} to ${newAssociatedFilePath}? (yes/no)\n`);
 		if (shouldMoveAssociatedFile.toLowerCase() === 'y') {
 			fs.renameSync(associatedFilePath, newAssociatedFilePath);
@@ -346,9 +346,11 @@ async function moveTrickplayFiles(movieName, newFolderPath, title, year) {
 		// Create trickplay folder inside movie folder if it doesn't exist
 		if (!fs.existsSync(newTrickplayFolderPath)) {
 			fs.mkdirSync(newTrickplayFolderPath);
+			console.log(`Created new trickplay folder: ${newTrickplayFolderPath}`);
 		}
 
 		fs.renameSync(trickplayFilePath, trickplayDestinationFilePath);
+		console.log(chalk.green(`Moved ${trickplayFilePath} to ${trickplayDestinationFilePath}`));
 
 		/* const shouldMoveTrickplayFile = await promptUser(`Move ${trickplayFilePath} to ${trickplayDestinationFilePath}? (yes/no)\n`);
 		if (shouldMoveTrickplayFile.toLowerCase() === 'y') {
