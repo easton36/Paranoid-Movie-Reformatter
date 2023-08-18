@@ -123,7 +123,7 @@ async function processMovieFile(file, moviePath, movieExtension) {
 	const movieName = file.substring(0, file.lastIndexOf('.'));
 	const [title, year] = movieName.split('-').map((item) => item.trim());
 
-	if (!title || !year) {
+	if (!title || !year || isNaN(year)) {
 		console.log(`Skipping ${moviePath} - Invalid format`);
 		return;
 	}
