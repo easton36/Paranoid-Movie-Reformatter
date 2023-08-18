@@ -3,7 +3,7 @@ const path = require('path');
 const readline = require('readline');
 const chalk = require('chalk');
 
-const moviesFolderPath = '/media_storage/Movies';
+const moviesFolderPath = '/media_storage/Documentaries';
 const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
 
 const rl = readline.createInterface({
